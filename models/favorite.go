@@ -6,12 +6,12 @@ import (
 )
 
 type Favorite struct {
-	UserID     int64 `json:"user_id" binding:"required"`
-	FavoriteID int64 `json:"favorite_id" binding:"required"`
+	UserID     int64 `json:"userId" binding:"required"`
+	FavoriteID int64 `json:"favoriteId" binding:"required"`
 }
 
 func (f Favorite) Save() error {
-	query := "INSERT INTO favorites (user_id, favorite_id) VALUES (?, ?)"
+	query := "INSERT INTO favorites (user_id, book_id) VALUES (?, ?)"
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("failed to prepare save query: %w", err)
@@ -32,7 +32,7 @@ func (f Favorite) Save() error {
 }
 
 func (f Favorite) Delete() error {
-	query := "DELETE FROM favorites WHERE user_id = ? AND favorite_id = ?"
+	query := "DELETE FROM favorites WHERE user_id = ? AND book_id = ?"
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("failed to prepare delete query: %w", err)
@@ -53,7 +53,7 @@ func (f Favorite) Delete() error {
 }
 
 func GetFavorites(userID int64) ([]int64, error) {
-	query := "SELECT favorite_id FROM favorites WHERE user_id = ?"
+	query := "SELECT book_id FROM favorites WHERE user_id = ?"
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare getFavorites query: %w", err)

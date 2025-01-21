@@ -14,50 +14,32 @@ type User struct {
 	Registered bool   `json:"registered"`
 }
 
-func (u User) Save(token string) error {
-	var query string
-
-	hashedPassword, err := utils.HashPassword(u.Password)
-
-	if err != nil {
-		return err
-	}
-
-	var args []interface{}
-	if token == "" {
-		query = "INSERT INTO users (email, password) VALUES (?,?)"
-
-		args = append(args, u.Email, hashedPassword)
-	} else {
-		id, err := utils.VerifyToken(token)
-
-		if err != nil {
-			return err
-		}
-
-		query = fmt.Sprintf("UPDATE users SET email = ?, password = ? WHERE id = ?")
-
-		args = append(args, u.Email, hashedPassword, id)
-	}
+func (u User) Save() (string, error) {
+	query := "UPDATE users SET registered = TRUE, email = ?, password = ? WHERE id = ?"
 
 	stmt, err := db.DB.Prepare(query)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	defer stmt.Close()
 
-	result, err := stmt.Exec(args...)
+	hashedPassword, err := utils.HashPassword(u.Password)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	userID, err := result.LastInsertId()
-	u.ID = userID
+	_, err = stmt.Exec(u.Email, hashedPassword, u.ID)
 
-	return err
+	if err != nil {
+		return "", err
+	}
+
+	token, err := utils.GenerateUserToken(u.Email, u.ID)
+
+	return token, err
 }
 
 func (u *User) ValidateCredentials() error {
@@ -81,23 +63,44 @@ func (u *User) ValidateCredentials() error {
 	return nil
 }
 
-func (u *User) CreateGuest() error {
-	query := "SELECT id FROM users ORDER BY id DESC LIMIT 1"
+func (u *User) CreateGuest() (string, error) {
+	query := "INSERT INTO users (registered) VALUES (FALSE)"
 
-	row := db.DB.QueryRow(query)
+	response, err := db.DB.Exec(query)
 
-	var ID int64
-
-	err := row.Scan(ID)
+	ID, err := response.LastInsertId()
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	ID++
+	hashedPassword, err := utils.HashPassword(fmt.Sprintf("password%v", ID))
 
+	if err != nil {
+		return "", err
+	}
+
+	u.Password = hashedPassword
 	u.Email = fmt.Sprintf("email_%v", ID)
-	u.Password = fmt.Sprintf("password%v", ID)
+	u.ID = ID
 
-	return nil
+	query = "UPDATE users SET email = ?, password = ? WHERE id = ?"
+
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return "", err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(u.Email, u.Password, u.ID)
+
+	if err != nil {
+		return "", err
+	}
+
+	token, err := utils.GenerateGuestToken(u.Email, u.ID)
+
+	return token, err
 }

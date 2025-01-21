@@ -18,16 +18,16 @@ func singup(context *gin.Context) {
 		return
 	}
 
-	token := context.Request.Header.Get("Authorization")
+	user.ID = context.GetInt64("userID")
 
-	err = user.Save(token)
+	token, err := user.Save()
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not save the user"})
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"message": "The user was created successfully"})
+	context.JSON(http.StatusCreated, gin.H{"message": "The user was saved successfuly", "token": token})
 
 }
 
@@ -56,32 +56,20 @@ func login(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
+
 }
 
 func createGuestUser(context *gin.Context) {
 
 	var user models.User
 
-	err := user.CreateGuest()
+	token, err := user.CreateGuest()
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not create a guest user"})
-		return
-	}
-
-	token, err := utils.GenerateGuestToken(user.Email, user.ID)
-
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not create a guest user"})
-		return
-	}
-
-	err = user.Save("")
-
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not create a guest user"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not create a guest user 1"})
 		return
 	}
 
 	context.JSON(http.StatusOK, gin.H{"message": "Guesr user was successfuly created", "token": token})
+
 }

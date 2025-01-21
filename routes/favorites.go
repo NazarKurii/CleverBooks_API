@@ -2,13 +2,14 @@ package routes
 
 import (
 	"net/http"
+	"strconv"
 	"test/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 type favoriteRequest struct {
-	FavoriteID int64 `json:"favorite_id"`
+	BookID int64 `json:"bookId"`
 }
 
 func addToFavorites(context *gin.Context) {
@@ -17,13 +18,13 @@ func addToFavorites(context *gin.Context) {
 	err := context.ShouldBindJSON(&favoriteRequest)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse the data", "error": err.Error()})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse the data"})
 		return
 	}
 
 	var favorite = models.Favorite{
 		UserID:     context.GetInt64("userID"),
-		FavoriteID: favoriteRequest.FavoriteID,
+		FavoriteID: favoriteRequest.BookID,
 	}
 
 	err = favorite.Save()
@@ -38,18 +39,26 @@ func addToFavorites(context *gin.Context) {
 }
 
 func deleteFromFavorites(context *gin.Context) {
+	bookIDString := context.Query("bookId")
 
-	var favoriteRequest favoriteRequest
-	err := context.ShouldBindJSON(&favoriteRequest)
+	if bookIDString == "" {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "Missing 'bookId' parameter in the request",
+		})
+		return
+	}
 
+	bookID, err := strconv.Atoi(bookIDString)
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse the data", "error": err.Error()})
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "'bookId' must be a valid integer",
+		})
 		return
 	}
 
 	var favorite = models.Favorite{
 		UserID:     context.GetInt64("userID"),
-		FavoriteID: favoriteRequest.FavoriteID,
+		FavoriteID: int64(bookID),
 	}
 
 	err = favorite.Delete()

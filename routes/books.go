@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"test/db"
 	"test/models"
+	"test/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -47,20 +48,18 @@ func getHomeCatalogue(context *gin.Context) {
 
 func getCatalogue(context *gin.Context) {
 
-	var Request struct {
-		IDs []int `json:"ids"`
-	}
+	param := context.QueryArray("ids")
 
-	err := context.ShouldBindJSON(&Request)
+	IDs, err := utils.StringToInt(param)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data", "err": err.Error()})
 		return
 	}
 
 	var catalogue models.Catalogue
 
-	err = catalogue.GetBooksInfo(Request.IDs, context.GetInt64("userID"))
+	err = catalogue.GetBooksInfo(IDs, context.GetInt64("userID"))
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not find books", "err": err.Error()})

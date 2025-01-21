@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 	"test/db"
-	"test/utils"
 )
 
 type Book struct {
@@ -30,60 +29,6 @@ type Book struct {
 }
 
 type Catalogue []Book
-
-// func (book *Book) IsFavorite(userID int64) error {
-// 	query := "SELECT book_id FROM favorites WHERE user_id = ? AND book_id = ?"
-
-// 	stmt, err := db.DB.Prepare(query)
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	row := stmt.QueryRow(userID, book.ID)
-
-// 	err = row.Scan()
-
-// 	if err == nil {
-// 		book.Favorite = true
-// 		return nil
-// 	}
-
-// 	if err == sql.ErrNoRows {
-// 		return nil
-// 	}
-
-// 	return err
-
-// }
-
-// func (book *Book) GetCart(userID int64) error {
-// 	query := "SELECT amount FROM cart WHERE user_id = ? AND book_id = ?"
-
-// 	stmt, err := db.DB.Prepare(query)
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	row := stmt.QueryRow(userID, book.ID)
-
-// 	var cart int
-
-// 	err = row.Scan(&cart)
-
-// 	if err == nil {
-// 		book.Cart = cart
-// 		return nil
-// 	}
-
-// 	if err == sql.ErrNoRows {
-// 		return nil
-// 	}
-
-// 	return err
-
-// }
 
 func (catalogue *Catalogue) GetBooksInfo(IDs []int, userID int64) error {
 
@@ -123,6 +68,9 @@ func (catalogue *Catalogue) GetBooksInfo(IDs []int, userID int64) error {
 	if err != nil {
 		return err
 	}
+
+	defer stmt.Close()
+
 	args = append([]interface{}{userID, userID}, args...)
 	rows, err := stmt.Query(args...)
 
@@ -160,7 +108,7 @@ func CreateTemporaryCatalogue() {
 
 	row := db.DB.QueryRow("SELECT id FROM catalogue LIMIT 1 ")
 
-	var id int = 2
+	var id int = 0
 	_ = row.Scan(&id)
 
 	if id == 1 {
@@ -201,24 +149,10 @@ func CreateTemporaryCatalogue() {
 		}
 	}
 
-	var user = User{
-		Email:    "exaple@example.com",
-		Password: "exaple",
-	}
+	var user User
+	token, _ := user.CreateGuest()
 
-	err = user.Save("")
-
-	if err != nil {
-		panic(err.Error())
-	}
-
-	token, err := utils.GenerateUserToken(user.Email, user.ID)
-
-	if err != nil {
-		panic(err.Error())
-	}
-
-	fmt.Println("TOKEN: ", token)
+	fmt.Println(token)
 }
 
 func createPlaceHolders[T any](elements []T) ([]string, []interface{}, error) {

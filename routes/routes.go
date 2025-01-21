@@ -7,17 +7,23 @@ import (
 )
 
 func RegisterRoutes(server *gin.Engine) {
-	server.POST("/singup", singup)
-	server.POST("/login", login)
-	server.GET("/catalogue", getCatalogue)
-	server.POST("/guest", createGuestUser)
+	server.POST("/login", login)           //OK
+	server.POST("/guest", createGuestUser) //OK
 
 	authenticated := server.Group("/")
 	authenticated.Use(middlewares.Authentificate)
 
-	authenticated.POST("/favorites", addToFavorites)
-	authenticated.DELETE("/favorites", deleteFromFavorites)
-	authenticated.GET("/favorites", getFavorites)
-	authenticated.GET("/homeCatalogues", getHomeCatalogue)
+	authenticated.POST("/favorite", addToFavorites)        //OK
+	authenticated.DELETE("/favorite", deleteFromFavorites) //OK
+	authenticated.GET("/favorite", getFavorites)           //OK
 
+	authenticated.POST("/singup", singup) //OK
+
+	authenticated.GET("/homeCatalogues", getHomeCatalogue) //OK
+	authenticated.GET("/catalogue", getCatalogue)          //OK
+
+	authenticated.GET("/cart", getCart)           //OK
+	authenticated.POST("/cart", addToCart)        //OK
+	authenticated.PUT("/cart", removeFromCart)    //OK
+	authenticated.DELETE("/cart", deleteFromCart) //OK
 }
