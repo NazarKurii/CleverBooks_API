@@ -28,6 +28,8 @@ func createTables() {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			email TEXT UNIQUE,
 			password TEXT,
+			name TEXT,
+			surname TEXT,
 			registered BOOLEAN
 		)
 	`

@@ -12,19 +12,7 @@
     "book": false,
     "imageUrl": "https://m.media-amazon.com/images/M/MV5BMTA1NDQ3NTcyOTNeQTJeQWpwZ15BbWU3MDA0MzA4MzE@._V1_.jpg"
   },
-  {
-    "title": "Jane Eyre",
-    "author": "Charlotte Bronte",
-    "genre": "Romance",
-    "year": 1847,
-    "language": "English",
-    "price": 8.49,
-    "booksLeft": 15,
-    "ebook": false,
-    "audioBook": true,
-    "book": true,
-    "imageUrl": "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1692725440i/197321006.jpg"
-  },
+ 
   {
     "title": "Gone with the Wind",
     "author": "Margaret Mitchell",
@@ -129,19 +117,7 @@
     "book": false,
     "imageUrl": "https://media.s-bol.com/BymzqnrRyAPn/12oX0G/518x840.jpg"
   },
-  {
-    "title": "The Great Gatsby",
-    "author": "F. Scott Fitzgerald",
-    "genre": "Novel",
-    "year": 1925,
-    "language": "English",
-    "price": 7.99,
-    "booksLeft": 18,
-    "ebook": false,
-    "audioBook": true,
-    "book": true,
-    "imageUrl": "https://m.media-amazon.com/images/I/81QuEGw8VPL.jpg"
-  },
+
   {
     "title": "1984",
     "author": "George Orwell",
@@ -234,19 +210,7 @@
     "imageUrl": "https://m.media-amazon.com/images/I/81W6BFaJJWL._AC_UF1000,1000_QL80_.jpg"
   },
 
-  {
-    "title": "The Road",
-    "author": "Cormac McCarthy",
-    "genre": "Fiction",
-    "year": 2006,
-    "language": "English",
-    "price": 8.49,
-    "booksLeft": 28,
-    "ebook": true,
-    "audioBook": true,
-    "book": true,
-    "imageUrl": "https://m.media-amazon.com/images/I/81P45LkcMuL._AC_UF1000,1000_QL80_.jpg"
-  },
+ 
   {
     "title": "Life of Pi",
     "author": "Yann Martel",

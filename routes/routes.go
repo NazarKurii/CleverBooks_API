@@ -13,6 +13,10 @@ func RegisterRoutes(server *gin.Engine) {
 	authenticated := server.Group("/")
 	authenticated.Use(middlewares.Authentificate)
 
+	authenticated.POST("/loginJWT", loginJWT) //OK
+
+	authenticated.POST("/verifyEmail", verifyEmail)
+
 	authenticated.POST("/favorite", addToFavorites)        //OK
 	authenticated.DELETE("/favorite", deleteFromFavorites) //OK
 	authenticated.GET("/favorite", getFavorites)           //OK
