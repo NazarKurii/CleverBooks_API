@@ -77,9 +77,9 @@ func getFavorites(context *gin.Context) {
 	favorites, err := models.GetFavorites(context.GetInt64("userID"))
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not reach to the data"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not reach to the data", "err": err.Error()})
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"favorites": favorites})
+	context.JSON(http.StatusOK, gin.H{"books": favorites})
 }

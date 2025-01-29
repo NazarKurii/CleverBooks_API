@@ -9,11 +9,13 @@ import (
 func RegisterRoutes(server *gin.Engine) {
 	server.POST("/login", login)           //OK
 	server.POST("/guest", createGuestUser) //OK
+	server.POST("/all", getAll)            //OK
 
 	authenticated := server.Group("/")
 	authenticated.Use(middlewares.Authentificate)
 
 	authenticated.POST("/loginJWT", loginJWT) //OK
+	authenticated.POST("/userInfo", userInfo) //OK
 
 	authenticated.POST("/verifyEmail", verifyEmail)
 

@@ -13,12 +13,13 @@ type User struct {
 	Email      string `json:"email"`
 	Name       string `json:"name"`
 	Surname    string `json:"surname"`
+	Number     string `json:"number"`
 	Password   string `json:"password"`
 	Registered bool   `json:"registered"`
 }
 
 func (u User) Save() (string, error) {
-	query := "UPDATE users SET name = ?, surname = ?, registered = TRUE, email = ?, password = ? WHERE id = ?"
+	query := "UPDATE users SET name = ?, surname = ?, number = ?, email = ?, password = ?, registered = TRUE WHERE id = ?"
 
 	stmt, err := db.DB.Prepare(query)
 
@@ -34,13 +35,15 @@ func (u User) Save() (string, error) {
 		return "", err
 	}
 
-	_, err = stmt.Exec(u.Name, u.Surname, u.Email, hashedPassword, u.ID)
+	_, err = stmt.Exec(u.Name, u.Surname, u.Number, u.Email, hashedPassword, u.ID)
 
 	if err != nil {
 		return "", err
 	}
 
 	token, err := utils.GenerateUserToken(u.Email, u.ID)
+
+	fmt.Println(u)
 
 	return token, err
 }
@@ -137,6 +140,7 @@ func (u User) VerifyEmail() (bool, error) {
 }
 
 func (u *User) IsRegistered() error {
+
 	query := "SELECT registered FROM users WHERE email = ?"
 
 	stmt, err := db.DB.Prepare(query)
@@ -149,17 +153,13 @@ func (u *User) IsRegistered() error {
 
 	row := stmt.QueryRow(u.Email)
 
-	if err != nil {
-		return err
-	}
-
 	err = row.Scan(&u.Registered)
 
 	return err
 }
 
 func (u *User) GetUser() error {
-	query := "SELECT * FROM users WHERE email = ?"
+	query := "SELECT * FROM users WHERE id = ?"
 
 	stmt, err := db.DB.Prepare(query)
 
@@ -169,13 +169,13 @@ func (u *User) GetUser() error {
 
 	defer stmt.Close()
 
-	row := stmt.QueryRow(u.Email)
+	row := stmt.QueryRow(u.ID)
 
 	if err != nil {
 		return err
 	}
 
-	err = row.Scan(&u.ID, &u.Email, &u.Password, &u.Name, &u.Surname, &u.Registered)
+	err = row.Scan(&u.ID, &u.Email, &u.Number, &u.Password, &u.Name, &u.Surname, &u.Registered)
 
 	return err
 }

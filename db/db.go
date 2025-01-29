@@ -26,7 +26,8 @@ func createTables() {
 	createUsersTable := `
 		CREATE TABLE IF NOT EXISTS users (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			email TEXT UNIQUE,
+			email TEXT,
+			number TEXT,
 			password TEXT,
 			name TEXT,
 			surname TEXT,

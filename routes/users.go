@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"test/db"
 	"test/models"
 	"test/utils"
 
@@ -59,6 +60,33 @@ func login(context *gin.Context) {
 
 }
 
+func userInfo(context *gin.Context) {
+
+	user := models.User{
+		ID: context.GetInt64("userID"),
+	}
+
+	err := user.GetUser()
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not get the user", "err": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "User was gotten successfuly", "user": user})
+
+}
+
+func getAll(context *gin.Context) {
+
+	query := "SELECT * FROM users"
+
+	rows, _ := db.DB.Query(query)
+
+	context.JSON(http.StatusOK, gin.H{"body": rows})
+
+}
+
 func loginJWT(context *gin.Context) {
 
 	user := models.User{
@@ -69,7 +97,7 @@ func loginJWT(context *gin.Context) {
 	err := user.IsRegistered()
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not log the user in", "err": err.Error()})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not log the user in"})
 		return
 	}
 
