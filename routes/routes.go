@@ -7,29 +7,41 @@ import (
 )
 
 func RegisterRoutes(server *gin.Engine) {
-	server.POST("/login", login)           //OK
-	server.POST("/guest", createGuestUser) //OK
-	server.POST("/all", getAll)            //OK
+	server.POST("/login", login)
+	server.POST("/guest", createGuestUser)
+	server.POST("/all", getAll)
 
 	authenticated := server.Group("/")
 	authenticated.Use(middlewares.Authentificate)
 
-	authenticated.POST("/loginJWT", loginJWT) //OK
-	authenticated.POST("/userInfo", userInfo) //OK
+	authenticated.POST("/loginJWT", loginJWT)
+	authenticated.POST("/googleAuth", googleAuth)
+	authenticated.POST("/userInfo", userInfo)
 
 	authenticated.POST("/verifyEmail", verifyEmail)
 
-	authenticated.POST("/favorite", addToFavorites)        //OK
-	authenticated.DELETE("/favorite", deleteFromFavorites) //OK
-	authenticated.GET("/favorite", getFavorites)           //OK
+	authenticated.POST("/favorite", addToFavorites)
+	authenticated.DELETE("/favorite", deleteFromFavorites)
+	authenticated.GET("/favorite", getFavorites)
 
-	authenticated.POST("/singup", singup) //OK
+	authenticated.GET("/orders", getOrders)
 
-	authenticated.GET("/homeCatalogues", getHomeCatalogue) //OK
-	authenticated.GET("/catalogue", getCatalogue)          //OK
+	authenticated.POST("/adress", addToAdresses)
+	authenticated.DELETE("/adress", deleteFromAdresses)
+	authenticated.GET("/adress", getAdresses)
 
-	authenticated.GET("/cart", getCart)           //OK
-	authenticated.POST("/cart", addToCart)        //OK
-	authenticated.PUT("/cart", removeFromCart)    //OK
-	authenticated.DELETE("/cart", deleteFromCart) //OK
+	authenticated.POST("/singup", singup)
+
+	authenticated.GET("/homeCatalogues", getHomeCatalogue)
+	authenticated.GET("/catalogue", getCatalogue)
+
+	authenticated.GET("/cart", getCart)
+	authenticated.POST("/cart", addToCart)
+	authenticated.PUT("/cart", removeFromCart)
+	authenticated.DELETE("/cart", deleteFromCart)
+
+	authenticated.POST("/checkout", checkoutURL)
+	authenticated.POST("/checkoutSuccessfull", checkoutSuccessful)
+	authenticated.POST("/checkoutFailed", checkoutFailed)
+
 }

@@ -43,8 +43,6 @@ func (u User) Save() (string, error) {
 
 	token, err := utils.GenerateUserToken(u.Email, u.ID)
 
-	fmt.Println(u)
-
 	return token, err
 }
 
@@ -127,7 +125,6 @@ func (u User) VerifyEmail() (bool, error) {
 
 	err = row.Scan(&u.Email)
 
-	fmt.Println(u)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return false, nil
@@ -178,4 +175,43 @@ func (u *User) GetUser() error {
 	err = row.Scan(&u.ID, &u.Email, &u.Number, &u.Password, &u.Name, &u.Surname, &u.Registered)
 
 	return err
+}
+
+func (u *User) LoginGoogle() (string, error) {
+	emailExists, err := u.VerifyEmail()
+
+	if err != nil {
+		return "", err
+	}
+
+	if !emailExists {
+		token, err := u.Save()
+		return token, err
+	}
+
+	query := "SELECT id FROM users WHERE email = ?"
+
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return "", err
+	}
+
+	defer stmt.Close()
+
+	resp := stmt.QueryRow(u.Email)
+
+	if resp.Err() == sql.ErrNoRows {
+		return "", errors.New("No user was found")
+	}
+
+	err = resp.Scan(&u.ID)
+	if err != nil {
+		return "", err
+	}
+
+	token, err := utils.GenerateUserToken(u.Email, u.ID)
+
+	return token, err
+
 }

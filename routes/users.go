@@ -121,6 +121,44 @@ func loginJWT(context *gin.Context) {
 
 }
 
+func googleAuth(context *gin.Context) {
+
+	var Request struct {
+		Code string `json:"code"`
+	}
+
+	err := context.ShouldBindJSON(&Request)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse the data"})
+		return
+	}
+
+	credentials, err := utils.GeteCredentialsByCode(context.Request, Request.Code)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not connect to google", "err": err.Error()})
+		return
+	}
+
+	var user = models.User{
+		ID:      context.GetInt64("userID"),
+		Name:    credentials.Name,
+		Surname: credentials.SurName,
+		Email:   credentials.Email,
+	}
+
+	token, err := user.LoginGoogle()
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not register the user"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "User was successfuly registered", "token": token})
+
+}
+
 func createGuestUser(context *gin.Context) {
 
 	var user models.User

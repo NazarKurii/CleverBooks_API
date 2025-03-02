@@ -164,3 +164,22 @@ func (userCart *UserCart) GetUsersCart() error {
 
 	return nil
 }
+
+func (userCart *UserCart) Clean() error {
+	query := "DELETE FROM carts WHERE user_id = ?"
+
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	result, err := stmt.Exec(userCart.UserID)
+
+	if effected, _ := result.RowsAffected(); effected == 0 {
+		return db.NoRowsEffectedError
+	}
+	return err
+}

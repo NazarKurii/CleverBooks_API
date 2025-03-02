@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -134,8 +135,8 @@ func CreateTemporaryCatalogue() {
 	json.Unmarshal(readFile, &catalogue)
 
 	stmt, err := db.DB.Prepare(`
-		INSERT INTO catalogue (title, author, genre, year, language, price, booksLeft, eBook, audioBook, book, imageURL)
-			Values(?,?,?,?,?,?,?,?,?,?,?)
+		INSERT INTO catalogue (title, author, genre, year, language, price, booksLeft, eBook, audioBook, book, imageURL, stripe_id)
+			Values(?,?,?,?,?,?,?,?,?,?,?,?)
 	`)
 
 	if err != nil {
@@ -143,7 +144,7 @@ func CreateTemporaryCatalogue() {
 	}
 
 	for _, book := range catalogue {
-		_, err := stmt.Exec(book.Title, book.Author, book.Genre, book.Year, book.Language, book.Price, book.BooksLeft, book.EBook, book.AudioBook, book.Book, book.ImageURL)
+		_, err := stmt.Exec(book.Title, book.Author, book.Genre, book.Year, book.Language, book.Price, book.BooksLeft, book.EBook, book.AudioBook, book.Book, book.ImageURL, "price_1QpdoUJZ010pKpoPBNN1q6po")
 		if err != nil {
 			panic(err.Error())
 		}
@@ -172,4 +173,27 @@ func createPlaceHolders[T any](elements []T) ([]string, []interface{}, error) {
 	}
 
 	return placeHolders, args, nil
+}
+
+func (b Book) GetStripeID() (string, error) {
+	query := "SELECT stripe_id FROM catalogue WHERE id = ?"
+
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return "", err
+	}
+
+	row := stmt.QueryRow(b.ID)
+
+	if row.Err() == sql.ErrNoRows {
+		return "", err
+	}
+
+	var id string
+
+	err = row.Scan(&id)
+
+	return id, err
+
 }

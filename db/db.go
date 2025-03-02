@@ -2,14 +2,18 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var DB *sql.DB
 
+var NoRowsEffectedError = errors.New("NO rows were effected")
+
 func InitDB() {
 	var err error
+
 	DB, err = sql.Open("sqlite3", "api.db")
 
 	if err != nil {
@@ -82,10 +86,76 @@ func createTables() {
 		eBook BOOLEAN NOT NULL,
 		audioBook BOOLEAN NOT NULL,
 		book BOOLEAN NOT NULL,
-		imageURL TEXT NOT NULL
+		imageURL TEXT NOT NULL,
+		stripe_id TEXT NOT NULL
 		)
 	`
 	_, err = DB.Exec(createBooksTable)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	createAdresses := `
+		CREATE TABLE IF NOT EXISTS adresses (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER,
+			street TEXT,
+  			city TEXT,
+			post_code TEXT,
+  			flat_number TEXT,
+  			house_number TEXT,
+  			country TEXT,
+			FOREIGN KEY (user_id) REFERENCES users(id)
+		)
+	`
+	_, err = DB.Exec(createAdresses)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	createOrders := `
+		CREATE TABLE IF NOT EXISTS orders (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			session_id TEXT NOT NULL,
+			name TEXT NOT NULL,
+			phone_number TEXT NOT NULL,
+		  	delivery_company TEXT NOT NULL,
+			comment TEXT NOT NULL,
+  			user_id NUMBER NOT NULL,
+  			
+			street TEXT NOT NULL,
+  			city TEXT NOT NULL,
+			post_code TEXT NOT NULL,
+  			flat_number TEXT NOT NULL,
+  			house_number TEXT NOT NULL,
+  			country TEXT NOT NULL,
+			status TEXT NOT NULL,
+  			FOREIGN KEY (user_id) REFERENCES users(id)
+		)
+	`
+
+	_, err = DB.Exec(createOrders)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	createOrderedItems := `
+		CREATE TABLE IF NOT EXISTS ordered_items (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			order_id INTEGER NOT NULL,
+			book_id INTEGER NOT NULL,
+			FOREIGN KEY (order_id) REFERENCES orders(id)
+			FOREIGN KEY (book_id) REFERENCES catalogue (id)
+	)
+`
+	_, err = DB.Exec(createOrderedItems)
 
 	if err != nil {
 		panic(err.Error())
