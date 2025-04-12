@@ -16,6 +16,11 @@ type Adress struct {
 	Country     string `json:"country"`
 }
 
+func nothing() {
+
+}
+
+// danfljanflen aef
 func GetAdresses(userID int64) ([]Adress, error) {
 	query := "SELECT id,user_id, street, city, post_code, flat_number, house_number, country FROM adresses WHERE user_id = ?"
 
