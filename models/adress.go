@@ -20,7 +20,13 @@ func nothing() {
 
 }
 
-// danfljanflen aef
+// danfljanfl
+// en aef
+
+func nothingdngjf() {
+
+}
+
 func GetAdresses(userID int64) ([]Adress, error) {
 	query := "SELECT id,user_id, street, city, post_code, flat_number, house_number, country FROM adresses WHERE user_id = ?"
 
